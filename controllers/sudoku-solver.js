@@ -19,11 +19,9 @@ class SudokuSolver {
 };
 
   checkRowPlacement(puzzleString, row, column, value) {
-    if (puzzleString[row * 9 + column] === value) {
-      return true;
-    } else if (puzzleString.slice(row * 9, row * 9 + 9).includes(value)) {
-      return false;
-    } else if (puzzleString.split('').filter((_, i) => i % 9 === column).includes(value)) {
+    let rowNums = '';
+    rowNums = puzzleString.slice(row * 9, row * 9 + 9);
+    if (rowNums.includes(value)) {
       return false;
     } else {
       return true;
@@ -31,11 +29,11 @@ class SudokuSolver {
   }
 
   checkColPlacement(puzzleString, row, column, value) {
-    if (puzzleString[row * 9 + column] === value) {
-      return true;
-    } else if (puzzleString.slice(row * 9, row * 9 + 9).includes(value)) {
-      return false;
-    } else if (puzzleString.split('').filter((_, i) => i % 9 === column).includes(value)) {
+    let colNums = '';
+    for (let i = column; i < 81; i += 9) {
+      colNums += puzzleString[i];
+    }
+    if (colNums.includes(value)) {
       return false;
     } else {
       return true;
@@ -43,12 +41,15 @@ class SudokuSolver {
   }
 
   checkRegionPlacement(puzzleString, row, column, value) {
-    let regionRow = Math.floor(row / 3) * 3;
-    let regionCol = Math.floor(column / 3) * 3;
-    let region = puzzleString.slice(regionRow * 9 + regionCol, regionRow * 9 + regionCol + 3) +
-      puzzleString.slice((regionRow + 1) * 9 + regionCol, (regionRow + 1) * 9 + regionCol + 3) +
-      puzzleString.slice((regionRow + 2) * 9 + regionCol, (regionRow + 2) * 9 + regionCol + 3);
-    if (region.includes(value)) {
+    let rowStart = row - row % 3;
+    let colStart = column - column % 3;
+    let regionNums = '';
+    for (let i = 0; i < 3; i++) {
+      for (let j = 0; j < 3; j++) {
+        regionNums += puzzleString[(rowStart + i) * 9 + (colStart + j)];
+      }
+    }
+    if (regionNums.includes(value)) {
       return false;
     } else {
       return true;
