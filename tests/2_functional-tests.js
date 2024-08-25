@@ -111,7 +111,7 @@ suite('Functional Tests', () => {
             .send({ puzzle: puzzleStrings.puzzlesAndSolutions[0][0], coordinate: 'B2', value: '' })
             .end((err, res) => {
                 assert.equal(res.status, 200);
-                assert.equal(res.body.error, 'Required field(s) missing');
+                assert.deepEqual(res.body.error, 'Required field(s) missing');
                 done();
             });
     });
