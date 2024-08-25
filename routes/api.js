@@ -24,6 +24,7 @@ module.exports = function (app) {
       if (!/^[1-9]$/.test(value)) {
         return res.json({ error: 'Invalid value' });
       }
+      console.log(coordinate, row, column);
       let checkRow = solver.checkRowPlacement(puzzle, row, column, value);
       let checkCol = solver.checkColPlacement(puzzle, row, column, value);
       let checkRegion = solver.checkRegionPlacement(puzzle, row, column, value);
