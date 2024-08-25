@@ -56,6 +56,15 @@ class SudokuSolver {
     }
   }
 
+  checkIfSameEntry(puzzleString, row, column, value) {
+    let index = column -1 + (row * 9 -9);
+    if (puzzleString[index] == value) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   solve(puzzleString) {
     // Implement a backtracking algorithm to solve the puzzle
     const findEmpty = (puzzle) => {

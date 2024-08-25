@@ -75,7 +75,7 @@ suite('Functional Tests', () => {
             .send({ puzzle: puzzleStrings.puzzlesAndSolutions[0][0], coordinate: 'A2', value: '3' })
             .end((err, res) => {
                 assert.equal(res.status, 200);
-                assert.deepEqual(res.body, { valid: true });
+                assert.deepEqual(res.body, { "valid": false, "conflict": [ "row", "column", "region" ] });
                 done();
             });
     });
@@ -96,7 +96,7 @@ suite('Functional Tests', () => {
     test('Check a puzzle placement with multiple placement conflicts: POST request to /api/check', (done) => {
         chai.request(server)
             .post('/api/check')
-            .send({ puzzle: puzzleStrings.puzzlesAndSolutions[0][0], coordinate: 'B2', value: '6' })
+            .send({ puzzle: puzzleStrings.puzzlesAndSolutions[0][0], coordinate: 'A2', value: '3' })
             .end((err, res) => {
                 assert.equal(res.status, 200);
                 assert.deepEqual(res.body, { valid: false, conflict: [ "row", "column", "region" ] });

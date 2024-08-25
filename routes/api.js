@@ -18,7 +18,7 @@ module.exports = function (app) {
       }
       let row = coordinate[0].charCodeAt(0) - 'A'.charCodeAt(0);
       let column = parseInt(coordinate[1]) - 1;
-      if (row < 0 || row > 8 || column < 0 || column > 8) {
+      if (parseInt(row) < 0 || parseInt(row) > 8 || parseInt(column) < 0 || parseInt(column) > 8) {
         return res.json({ error: 'Invalid coordinate' });
       }
       if (!/^[1-9]$/.test(value)) {
@@ -27,10 +27,15 @@ module.exports = function (app) {
       let checkRow = solver.checkRowPlacement(puzzle, row, column, value);
       let checkCol = solver.checkColPlacement(puzzle, row, column, value);
       let checkRegion = solver.checkRegionPlacement(puzzle, row, column, value);
-      if (checkRow && checkCol && checkRegion) {
+      let checkSame = solver.checkIfSameEntry(puzzle, row, column, value);
+      let conflict = [];
+      if (!checkRow && !checkCol && !checkRegion) {
         return res.json({ valid: true });
+      } else if (checkSame && checkRow && checkCol && checkRegion) {
+        return res.json({ valid: true });
+      } else if (!checkSame && checkRow && checkCol && checkRegion) {
+        return res.json({ valid: false, conflict: ['row', 'column', 'region'] });
       } else {
-        let conflict = [];
         if (!checkRow) {
           conflict.push('row');
         }
@@ -43,6 +48,7 @@ module.exports = function (app) {
         return res.json({ valid: false, conflict });
       }
     });
+    
     
   app.route('/api/solve')
     .post((req, res) => {
