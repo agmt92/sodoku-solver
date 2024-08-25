@@ -9,46 +9,46 @@ module.exports = function (app) {
   app.route('/api/check')
     .post((req, res) => {
       let { puzzle, coordinate, value } = req.body;
-      if (!puzzle || !coordinate || !value) {
-        return res.json({ error: 'Required field(s) missing' });
-      }
-      let valid = solver.validate(puzzle);
-      if (valid.error) {
-        return res.json(valid);
-      }
+      let solution = solver.solve(puzzle);
       let row = coordinate[0].charCodeAt(0) - 'A'.charCodeAt(0);
       let column = parseInt(coordinate[1]) - 1;
-      if (parseInt(row) < 0 || parseInt(row) > 8 || parseInt(column) < 0 || parseInt(column) > 8) {
-        return res.json({ error: 'Invalid coordinate' });
-      }
-      if (!/^[1-9]$/.test(value)) {
-        return res.json({ error: 'Invalid value' });
-      }
-      console.log('Coordinates: '+ coordinate, 'Row: '+ row, 'Column: '+ column, 'Value: '+ value);
-      console.log('Puzzle: '+ puzzle);
+      let valid = solver.validate(puzzle);
       let checkRow = solver.checkRowPlacement(puzzle, row, column, value);
       let checkCol = solver.checkColPlacement(puzzle, row, column, value);
       let checkRegion = solver.checkRegionPlacement(puzzle, row, column, value);
       let checkSame = solver.checkIfSameEntry(puzzle, row, column, value);
       let conflict = [];
-      if (!checkRow && !checkCol && !checkRegion) {
+      console.log('coordinate, value', coordinate, value);
+      console.log('puzzle', puzzle);
+      // console.log(solution.charAt(row * 9 + column));
+      // console.log(value);
+      // console.log(solution.charAt(row * 9 + column) == value);
+      // validate inputs
+      if (valid.error) {
+        return res.json(valid);
+      } else if (!puzzle || !coordinate || !value) {
+        return res.json({ error: 'Required field(s) missing' });
+      } else if (coordinate.length !== 2 || !/[A-I]/.test(coordinate[0]) || !/[1-9]/.test(coordinate[1])) {
+        return res.json({ error: 'Invalid coordinate' });
+      } else if (!/^[1-9]$/.test(value)) {
+        return res.json({ error: 'Invalid value' });
+      } // if all pass, check if correct answer first
+      else if (solution.charAt(row * 9 + column) == value) {
         return res.json({ valid: true });
-      } else if (checkSame && checkRow && checkCol && checkRegion) {
-        return res.json({ valid: true });
-      } else if (!checkSame && checkRow && checkCol && checkRegion) {
-        return res.json({ valid: false, conflict: ['row', 'column', 'region'] });
-      } else {
-        if (!checkRow) {
-          conflict.push('row');
+        } else if (checkSame) {
+          return res.json({ valid: true });
+        } else {
+          if (!checkRow) {
+            conflict.push('row');
+          }
+          if (!checkCol) {
+            conflict.push('column');
+          }
+          if (!checkRegion) {
+            conflict.push('region');
+          }
+          return res.json({ valid: false, conflict });
         }
-        if (!checkCol) {
-          conflict.push('column');
-        }
-        if (!checkRegion) {
-          conflict.push('region');
-        }
-        return res.json({ valid: false, conflict });
-      }
     });
     
     
