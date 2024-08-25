@@ -5,9 +5,13 @@ class SudokuSolver {
     const errors = {
       invalidChar: 'Invalid characters in puzzle',
       invalidLength: 'Expected puzzle to be 81 characters long',
+      invalidString: 'Required field(s) missing'
   };
   let numbers = '123456789';
-  if (puzzleString.length !== 81) {
+  if (!puzzleString) {
+    return { error: errors.invalidString };
+  }
+  else if (puzzleString.length !== 81) {
     return { error: errors.invalidLength };
   }
   else if (!/^[1-9.]+$/.test(puzzleString)) {
@@ -20,6 +24,7 @@ class SudokuSolver {
 
   checkRowPlacement(puzzleString, row, column, value) {
     let rowNums = '';
+    if(this.validate(puzzleString).error) return false;
     rowNums = puzzleString.slice(row * 9, row * 9 + 9);
     if (rowNums.includes(value)) {
       return false;
@@ -30,6 +35,7 @@ class SudokuSolver {
 
   checkColPlacement(puzzleString, row, column, value) {
     let colNums = '';
+    if(this.validate(puzzleString).error) return false;
     for (let i = column; i < 81; i += 9) {
       colNums += puzzleString[i];
     }
@@ -41,6 +47,7 @@ class SudokuSolver {
   }
 
   checkRegionPlacement(puzzleString, row, column, value) {
+    if(this.validate(puzzleString).error) return false;
     let rowStart = row - row % 3;
     let colStart = column - column % 3;
     let regionNums = '';
@@ -58,6 +65,7 @@ class SudokuSolver {
 
   checkIfSameEntry(puzzleString, row, column, value) {
     let index = column -1 + (row * 9 -9);
+    if(this.validate(puzzleString).error) return false;
     if (puzzleString[index] == value) {
       return true;
     } else {
@@ -67,6 +75,7 @@ class SudokuSolver {
 
   solve(puzzleString) {
     // Implement a backtracking algorithm to solve the puzzle
+    if (this.validate(puzzleString).error) return { error: 'Puzzle cannot be solved' };
     const findEmpty = (puzzle) => {
       for (let i = 0; i < 81; i++) {
         if (puzzle[i] === '.') return i;
